@@ -34,8 +34,14 @@ func uploadAMI(cmd *cobra.Command, args []string) {
 	check(err)
 	targetArch, err := flags.GetString("target-arch")
 	check(err)
+	kmsKey, err := flags.GetString("ksmKey")
+	check(err)
+	importRole, err := flags.GetString("custom-import-role")
+	check(err)
+	encrypted, err := flags.GetBool("encrypt")
+	check(err)
 
-	check(uploader.UploadAndRegister(client, filename, bucketName, imageName, targetArch, nil))
+	check(uploader.UploadAndRegister(client, filename, bucketName, imageName, targetArch, nil, importRole, encrypted, kmsKey))
 }
 
 func setupCLI() *cobra.Command {

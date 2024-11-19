@@ -24,8 +24,19 @@ func uploadAMI(path, targetArch string, flags *pflag.FlagSet) error {
 	if err != nil {
 		return err
 	}
-
 	client, err := awscloud.NewDefault(region)
+	if err != nil {
+		return err
+	}
+	encrypted, err := flags.GetBool("encrypt")
+	if err != nil {
+		return err
+	}
+	kmsKey, err := flags.GetString("kmsKey")
+	if err != nil {
+		return err
+	}
+	importRole, err := flags.GetString("custom-import-role")
 	if err != nil {
 		return err
 	}
@@ -38,5 +49,5 @@ func uploadAMI(path, targetArch string, flags *pflag.FlagSet) error {
 		pbar = pb.New(0)
 	}
 
-	return uploader.UploadAndRegister(client, path, bucketName, imageName, targetArch, pbar)
+	return uploader.UploadAndRegister(client, path, bucketName, imageName, targetArch, pbar, importRole, encrypted, kmsKey)
 }

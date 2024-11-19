@@ -609,6 +609,9 @@ func buildCobraCmdline() (*cobra.Command, error) {
 	buildCmd.Flags().String("output", ".", "artifact output directory")
 	buildCmd.Flags().String("progress", "text", "type of progress bar to use")
 	buildCmd.Flags().String("store", "/store", "osbuild store for intermediate pipeline trees")
+	buildCmd.Flags().String("kmsKey", "", "non-default KMS key for encrypting AMI (if enable encryption), support following formats: Key ID, alias, arn")
+	buildCmd.Flags().String("custom-import-role", "", "aws iam role for importing snapshot to create AMI. Default: vmimport")
+	buildCmd.Flags().Bool("encrypt", false, "enable encryption for AMI")
 	// flag rules
 	for _, dname := range []string{"output", "store", "rpmmd"} {
 		if err := buildCmd.MarkFlagDirname(dname); err != nil {

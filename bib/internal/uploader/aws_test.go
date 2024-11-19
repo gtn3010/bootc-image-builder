@@ -49,7 +49,7 @@ func TestUploadAndRegisterNoProgressBar(t *testing.T) {
 	require.Nil(t, err)
 	fakeUploader := &FakeAwsUploader{}
 
-	err = uploader.UploadAndRegister(fakeUploader, fakeDiskFile, "bucketName", "imageName", "", nil)
+	err = uploader.UploadAndRegister(fakeUploader, fakeDiskFile, "bucketName", "imageName", "", nil, "", false, "")
 	require.Nil(t, err)
 
 	assert.Equal(t, fakeUploader.uploadCalled, 1)
@@ -79,7 +79,7 @@ func TestUploadAndRegisterProgressBar(t *testing.T) {
 
 	pbar := pb.New(0)
 
-	err = uploader.UploadAndRegister(fakeUploader, fakeDiskFile, "bucketName", "imageName", "", pbar)
+	err = uploader.UploadAndRegister(fakeUploader, fakeDiskFile, "bucketName", "imageName", "", pbar, "", false, "")
 	require.Nil(t, err)
 
 	assert.Equal(t, fakeUploader.uploadCalled, 1)
