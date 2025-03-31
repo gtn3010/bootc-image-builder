@@ -34,6 +34,7 @@ func New(ref string) (*Container, error) {
 		"--rm",
 		"--init", // If sleep infinity is run as PID 1, it doesn't get signals, thus we cannot easily stop the container
 		"--detach",
+		"--security-opt", "label=disable", // Disable selinux of the container for running in bottlerocket
 		"--net", "host", // Networking in a nested container doesn't work without re-using this container's network
 		"--entrypoint", "sleep", // The entrypoint might be arbitrary, so let's just override it with sleep, we don't want to run anything
 	}
