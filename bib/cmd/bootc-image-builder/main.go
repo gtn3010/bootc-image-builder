@@ -354,6 +354,9 @@ func handleAWSFlags(cmd *cobra.Command) (cloud.Uploader, error) {
 	bucketName, _ := cmd.Flags().GetString("aws-bucket")
 	imageName, _ := cmd.Flags().GetString("aws-ami-name")
 	targetArch, _ := cmd.Flags().GetString("target-arch")
+	importRole, _ := cmd.Flags().GetString("aws-import-role")
+	encrypted, _ := cmd.Flags().GetBool("aws-snapshot-encrypted")
+	kmsKey, _ := cmd.Flags().GetString("aws-kms-key")
 
 	if !slices.Contains(imgTypes, "ami") {
 		return nil, fmt.Errorf("aws flags set for non-ami image type (type is set to %s)", strings.Join(imgTypes, ","))
@@ -363,7 +366,7 @@ func handleAWSFlags(cmd *cobra.Command) (cloud.Uploader, error) {
 	uploaderOpts := &awscloud.UploaderOptions{
 		TargetArch: targetArch,
 	}
-	uploader, err := awscloud.NewUploader(region, bucketName, imageName, uploaderOpts)
+	uploader, err := awscloud.NewUploader(region, bucketName, imageName, importRole, encrypted, kmsKey, uploaderOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -669,6 +672,9 @@ func buildCobraCmdline() (*cobra.Command, error) {
 	buildCmd.Flags().String("aws-ami-name", "", "name for the AMI in AWS (only for type=ami)")
 	buildCmd.Flags().String("aws-bucket", "", "target S3 bucket name for intermediate storage when creating AMI (only for type=ami)")
 	buildCmd.Flags().String("aws-region", "", "target region for AWS uploads (only for type=ami)")
+	buildCmd.Flags().String("aws-kms-key", "", "non-default KMS key for encrypting AMI (if enable encryption), support following formats: Key ID, alias, arn")
+	buildCmd.Flags().String("aws-custom-import-role", "", "aws iam role for importing snapshot to create AMI. Default: vmimport")
+	buildCmd.Flags().Bool("aws-encrypt-snapshot", false, "enable encryption for AMI")
 	buildCmd.Flags().String("chown", "", "chown the ouput directory to match the specified UID:GID")
 	buildCmd.Flags().String("output", ".", "artifact output directory")
 	buildCmd.Flags().String("store", "/store", "osbuild store for intermediate pipeline trees")
