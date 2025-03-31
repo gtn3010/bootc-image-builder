@@ -17,7 +17,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-replace github.com/osbuild/images => /home/gtn/public-github/public-github/osbuild-images
+replace github.com/osbuild/images => /images
 
 require (
 	dario.cat/mergo v1.0.1 // indirect
