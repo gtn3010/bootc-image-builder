@@ -16,6 +16,7 @@ import (
 	"github.com/osbuild/images/pkg/container"
 	"github.com/osbuild/images/pkg/customizations/anaconda"
 	"github.com/osbuild/images/pkg/customizations/kickstart"
+	"github.com/osbuild/images/pkg/customizations/oscap"
 	"github.com/osbuild/images/pkg/customizations/users"
 	"github.com/osbuild/images/pkg/disk"
 	"github.com/osbuild/images/pkg/image"
@@ -334,6 +335,13 @@ func manifestForDiskImage(c *ManifestConfig, rng *rand.Rand) (*manifest.Manifest
 	img.Groups = users.GroupsFromBP(customizations.GetGroups())
 	// TODO: get from the bootc container instead of hardcoding it
 	img.SELinux = "targeted"
+
+	if c.Config.Customizations.OpenSCAP != nil {
+		img.OpenSCAPRemediationConfig = &oscap.RemediationConfig{
+			Datastream: customizations.OpenSCAP.DataStream,
+			ProfileID: customizations.OpenSCAP.ProfileID,
+		}
+	}
 
 	img.KernelOptionsAppend = []string{
 		"rw",
