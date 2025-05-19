@@ -65,6 +65,9 @@ type ManifestConfig struct {
 
 	// use librepo ad the rpm downlaod backend
 	UseLibrepo bool
+
+	// Configure the SELinux state on the system.
+	SELinuxConfig string
 }
 
 func Manifest(c *ManifestConfig) (*manifest.Manifest, error) {
@@ -349,6 +352,8 @@ func manifestForDiskImage(c *ManifestConfig, rng *rand.Rand) (*manifest.Manifest
 			img.OpenSCAPRemediationConfig.TailoringConfig = oscapTailoringConf
 		}
 	}
+
+	img.SELinuxConfig = c.SELinuxConfig
 
 	img.KernelOptionsAppend = []string{
 		"rw",

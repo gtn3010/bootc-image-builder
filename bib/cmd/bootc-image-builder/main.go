@@ -204,6 +204,7 @@ func manifestFromCobra(cmd *cobra.Command, args []string, pbar progress.Progress
 	targetArch, _ := cmd.Flags().GetString("target-arch")
 	rootFs, _ := cmd.Flags().GetString("rootfs")
 	useLibrepo, _ := cmd.Flags().GetBool("use-librepo")
+	seLinuxConfig, _ := cmd.Flags().GetString("selinux-config")
 
 	// If --local was given, warn in the case of --local or --local=true (true is the default), error in the case of --local=false
 	if cmd.Flags().Changed("local") {
@@ -305,6 +306,11 @@ func manifestFromCobra(cmd *cobra.Command, args []string, pbar progress.Progress
 		SourceInfo:     sourceinfo,
 		RootFSType:     rootfsType,
 		UseLibrepo:     useLibrepo,
+		SELinuxConfig:  "enforcing",
+	}
+
+	if seLinuxConfig != "" {
+		manifestConfig.SELinuxConfig = seLinuxConfig
 	}
 
 	manifest, repos, err := makeManifest(manifestConfig, solver, rpmCacheRoot)
@@ -669,6 +675,7 @@ func buildCobraCmdline() (*cobra.Command, error) {
 	buildCmd.Flags().String("aws-kms-key", "", "non-default KMS key for encrypting AMI (if enable encryption), support following formats: Key ID, alias, arn")
 	buildCmd.Flags().String("aws-custom-import-role", "", "aws iam role for importing snapshot to create AMI. Default: vmimport")
 	buildCmd.Flags().Bool("aws-encrypt-snapshot", false, "enable encryption for AMI")
+	buildCmd.Flags().String("selinux-config", "enforcing", "Config SELinux state: enforcing,permissive,disabled. Default: enforcing")
 	buildCmd.Flags().String("chown", "", "chown the ouput directory to match the specified UID:GID")
 	buildCmd.Flags().String("output", ".", "artifact output directory")
 	buildCmd.Flags().String("store", "/store", "osbuild store for intermediate pipeline trees")
