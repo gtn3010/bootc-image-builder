@@ -205,6 +205,7 @@ func manifestFromCobra(cmd *cobra.Command, args []string, pbar progress.Progress
 	rootFs, _ := cmd.Flags().GetString("rootfs")
 	buildImgref, _ := cmd.Flags().GetString("build-container")
 	useLibrepo, _ := cmd.Flags().GetBool("use-librepo")
+	seLinuxConfig, _ := cmd.Flags().GetString("selinux-config")
 
 	// If --local was given, warn in the case of --local or --local=true (true is the default), error in the case of --local=false
 	if cmd.Flags().Changed("local") {
@@ -341,6 +342,11 @@ func manifestFromCobra(cmd *cobra.Command, args []string, pbar progress.Progress
 		BuildSourceInfo: buildSourceinfo,
 		RootFSType:      rootfsType,
 		UseLibrepo:      useLibrepo,
+		SELinuxConfig:  "enforcing",
+	}
+
+	if seLinuxConfig != "" {
+		manifestConfig.SELinuxConfig = seLinuxConfig
 	}
 
 	manifest, repos, err := makeManifest(manifestConfig, solver, rpmCacheRoot)
@@ -685,6 +691,7 @@ func buildCobraCmdline() (*cobra.Command, error) {
 	manifestCmd.Flags().String("target-arch", "", "build for the given target architecture (experimental)")
 	manifestCmd.Flags().String("build-container", "", "Use a custom container for the image build")
 	manifestCmd.Flags().StringArray("type", []string{"qcow2"}, fmt.Sprintf("image types to build [%s]", imagetypes.Available()))
+	manifestCmd.Flags().String("selinux-config", "enforcing", "Config SELinux state: enforcing,permissive,disabled. Default: enforcing")
 	manifestCmd.Flags().Bool("local", true, "DEPRECATED: --local is now the default behavior, make sure to pull the container image before running bootc-image-builder")
 	if err := manifestCmd.Flags().MarkHidden("local"); err != nil {
 		return nil, fmt.Errorf("cannot hide 'local' :%w", err)
