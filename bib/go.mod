@@ -18,6 +18,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
+replace github.com/osbuild/images => /images
+
 require (
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/BurntSushi/toml v1.5.1-0.20250403130103-3d3abc24416a // indirect
