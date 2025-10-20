@@ -96,9 +96,6 @@ func manifestFromCobra(cmd *cobra.Command, args []string, pbar progress.Progress
 	buildImgref, _ := cmd.Flags().GetString("build-container")
 	installerPayloadRef, _ := cmd.Flags().GetString("installer-payload-ref")
 	useLibrepo, _ := cmd.Flags().GetBool("use-librepo")
-	importRole, _ := cmd.Flags().GetString("aws-import-role")
-	encrypted, _ := cmd.Flags().GetBool("aws-snapshot-encrypted")
-	kmsKey, _ := cmd.Flags().GetString("aws-kms-key")
 
 	// If --local was given, warn in the case of --local or --local=true (true is the default), error in the case of --local=false
 	if cmd.Flags().Changed("local") {
@@ -237,6 +234,9 @@ func handleAWSFlags(cmd *cobra.Command) (cloud.Uploader, error) {
 	bucketName, _ := cmd.Flags().GetString("aws-bucket")
 	imageName, _ := cmd.Flags().GetString("aws-ami-name")
 	targetArchStr, _ := cmd.Flags().GetString("target-arch")
+	importRole, _ := cmd.Flags().GetString("aws-import-role")
+	encrypted, _ := cmd.Flags().GetBool("aws-snapshot-encrypted")
+	kmsKey, _ := cmd.Flags().GetString("aws-kms-key")
 
 	if !slices.Contains(imgTypes, "ami") {
 		return nil, fmt.Errorf("aws flags set for non-ami image type (type is set to %s)", strings.Join(imgTypes, ","))
