@@ -17,6 +17,7 @@ require (
 )
 
 replace github.com/osbuild/images => /images
+replace github.com/osbuild/blueprint => /blueprint
 
 require (
 	dario.cat/mergo v1.0.2 // indirect
