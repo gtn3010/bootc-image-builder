@@ -16,6 +16,8 @@ require (
 	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546
 )
 
+replace github.com/osbuild/images => /images
+
 require (
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
