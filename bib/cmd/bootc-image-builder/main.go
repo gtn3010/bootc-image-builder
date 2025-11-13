@@ -237,6 +237,7 @@ func handleAWSFlags(cmd *cobra.Command) (cloud.Uploader, error) {
 	importRole, _ := cmd.Flags().GetString("aws-import-role")
 	encrypted, _ := cmd.Flags().GetBool("aws-snapshot-encrypted")
 	kmsKey, _ := cmd.Flags().GetString("aws-kms-key")
+	tags, _ := cmd.Flags().GetStringArray("aws-ami-tag")
 
 	if !slices.Contains(imgTypes, "ami") {
 		return nil, fmt.Errorf("aws flags set for non-ami image type (type is set to %s)", strings.Join(imgTypes, ","))
@@ -253,7 +254,18 @@ func handleAWSFlags(cmd *cobra.Command) (cloud.Uploader, error) {
 	uploaderOpts := &awscloud.UploaderOptions{
 		TargetArch: targetArch,
 	}
-	uploader, err := awscloud.NewUploader(region, bucketName, imageName, importRole, encrypted, kmsKey, uploaderOpts)
+	awsTags := make([]awscloud.AWSTag, len(tags), 10)
+	for i := 0; i < len(tags); i++ {
+		if strings.Contains(tags[i], ":") {
+			kv := strings.SplitN(tags[i], ":", 2)
+			awsTags[i] = awscloud.AWSTag{
+				Name: kv[0],
+				Value: kv[1],
+			}
+		}
+	}
+	uploaderOpts.Tags = awsTags
+	uploader, err := awscloudNewUploader(region, bucketName, imageName, importRole, encrypted, kmsKey, uploaderOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -546,6 +558,7 @@ func buildCobraCmdline() (*cobra.Command, error) {
 	buildCmd.Flags().String("aws-kms-key", "", "non-default KMS key for encrypting AMI (if enable encryption), support following formats: Key ID, alias, arn")
 	buildCmd.Flags().String("aws-custom-import-role", "", "aws iam role for importing snapshot to create AMI. Default: vmimport")
 	buildCmd.Flags().Bool("aws-encrypt-snapshot", false, "enable encryption for AMI")
+	buildCmd.Flags().StringArray("aws-ami-tag", []string{"base-image:rhel9/rhel-bootc"}, "tags of AMI in aws (format key:value), support adding multiple tags")
 	// flag rules
 	for _, dname := range []string{"output", "store", "rpmmd"} {
 		if err := buildCmd.MarkFlagDirname(dname); err != nil {
