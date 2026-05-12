@@ -1,4 +1,4 @@
-ARG BUILDERIMAGE="golang:1.24.12"
+ARG BUILDERIMAGE="golang:1.25.3"
 ARG BASEIMAGE="registry.redhat.io/rhel9/bootc-image-builder:9.7"
 
 FROM $BUILDERIMAGE as builder
@@ -9,8 +9,11 @@ ENV CONTAINERS_STORAGE_THIN_TAGS="containers_image_openpgp exclude_graphdriver_b
 COPY . .
 RUN mkdir /images && git clone https://github.com/gtn3010/osbuild-images.git --depth 1 /images && \
     mkdir /blueprint && git clone https://github.com/gtn3010/blueprint.git --depth 1 /blueprint && \
+    mkdir /fastami && git clone https://github.com/gtn3010/fastami.git --depth 1 /fastami && \
     cd bib && go mod tidy && \
-    CGO_ENABLED=0 go build -tags "${CONTAINERS_STORAGE_THIN_TAGS}" -o ../bin/bootc-image-builder ./cmd/bootc-image-builder
+    CGO_ENABLED=0 go build -tags "${CONTAINERS_STORAGE_THIN_TAGS}" -o ../bin/bootc-image-builder ./cmd/bootc-image-builder && \
+    cd /fastami && go mod tidy && \
+    CGO_ENABLED=0 go build -o fastami .
 
 
 FROM $BASEIMAGE as base
@@ -21,3 +24,4 @@ RUN dnf install -y libxcrypt-compat zip && \
     unzip awscliv2.zip && \
     ./aws/install
 COPY --from=builder /app/bin/bootc-image-builder /usr/bin/bootc-image-builder
+COPY --from=builder /fastami/fastami /usr/bin/fastami
