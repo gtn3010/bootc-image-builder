@@ -133,18 +133,31 @@ def main(tree, options):
     if log is not None:
         log.close()
 
-    # run custom remediate script from base image bootc in chroot
+    # Copy custom remediate script from workspace to insternal osbuild tree path, the chroot and execute the remediate script.
     if custom_remediate_script_path != "":
-        cmd = [
-            "/usr/sbin/chroot", tree,
-            custom_remediate_script_path
+        script_name = custom_remediate_script_path.split("/")[-1]
+        pre_cmd = [
+            "cp", custom_remediate_script_path, f"{tree}/opt/{script_name}"
         ]
-        print("Running custom remediate script: ", repr(cmd))
+        cmd = [
+            "/usr/sbin/chroot", tree, f"/opt/{script_name}"
+        ]
+        clear_cmd = [
+            "rm", "-rf", f"{tree}/opt/{script_name}"
+        ]
+
+        print("Copy the custom remediate script from mounted /run/osbuild/lib: ", repr(pre_cmd))
+        subprocess.run(pre_cmd, encoding="utf8", stdout=sys.stderr, check=False)
+
+        print("Running the custom remediate script: ", repr(cmd))
         res = subprocess.run(cmd, encoding="utf8", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
-        print("Output when running custom remediate script: ", res.stdout)
+        print("Output when running the custom remediate script: ", res.stdout)
         if res.returncode not in (0, 2):
             print("Error when running custom remediate script: ", res.stderr)
-            # raise RuntimeError("failed to run custom remediate script")
+            raise RuntimeError("Failed to run custom remediate script")
+        else:
+            print("Clear custom remediate script path: ", repr(clear_cmd))
+            subprocess.run(clear_cmd, encoding="utf8", stdout=sys.stderr, check=False)
 
     # run openscap in chroot on the remediated image tree to generate final report
     if html_report is not None:

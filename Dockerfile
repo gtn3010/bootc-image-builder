@@ -1,5 +1,5 @@
 ARG BUILDERIMAGE="golang:1.25.3"
-ARG BASEIMAGE="registry.redhat.io/rhel9/bootc-image-builder:9.7"
+ARG BASEIMAGE="registry.redhat.io/rhel10/bootc-image-builder:10.2-1777553577"
 
 FROM $BUILDERIMAGE as builder
 
